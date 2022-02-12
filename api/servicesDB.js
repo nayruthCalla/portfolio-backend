@@ -46,6 +46,16 @@ module.exports = () => ({
       return err;
     }
   },
+  getDocumentByUser: async (model, userId) => {
+    try {
+      const getByUser = await model.find({ userId: userId });
+      console.log(getByUser[0]);
+      return getByUser[0];
+    } catch (err) {
+      console.log('elorr', err);
+      return err;
+    }
+  },
   getAllDocument: async (model) => {
     try {
       const documents = await model.find();
