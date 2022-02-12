@@ -70,6 +70,49 @@ const typeDefs = gql`
     "coverImage: cover background image, is of type string, if it can be null"
     coverImage: String!
   }
+  """
+  ✅ the about me has the following fields:
+   **id**, **userId**, **proyectName**, **proyectType**, **description**,
+   **startDate**, **endDate**, **linkDemo**, **linkRepo**, **imageProyect**
+  """
+  type Proyect {
+    "id: The id is unique for a user and is type string"
+    id: String!
+    "userId: The userId is unique for a user and is type string"
+    userId: String!
+    "proyectName:is the name of the project, is of type string and cannot be null"
+    proyectName: String!
+    "proyectType is the type of the project, is of type string and cannot be null"
+    proyectType: String!
+    "description: description of the project carried out, it is of type string and cannot be null"
+    description: String!
+    "startDate: project start date, is of type string, if it can be null"
+    startDate: String!
+    "endDate: project end date, is of type string, if it can be null"
+    endDate: String!
+    "linkDemo: demo link of the project, is of type string, if it can be null"
+    linkDemo: String!
+    "linkRepo: repository link of the project, is of type string, if it can be null"
+    linkRepo: String!
+    "imageProyect: project image, is of type array, if it can be null"
+    imageProyect: String!
+  }
+
+  """
+  ✅ The Skill has the fields of **id**, **userID**, **skillName**, **skillLink**, **imageSkill**
+  """
+  type Skill {
+    "id: The id is unique for a user and is type string"
+    id: String!
+    "userId: The userId is unique for a user and is type string"
+    userId: String!
+    "skillName tech skill name, is of type string and cannot be null"
+    skillName: String!
+    "skillLinktech: skill link, is of type string"
+    skillLink: String!
+    "imageSkill: technical skill image, is of type string"
+    imageSkill: String!
+  }
 
   # types Mutations
 
@@ -152,7 +195,7 @@ const typeDefs = gql`
     ): AboutMe!
     # update About me
     """
-    ✅ Mutation updateUser: To edit a AboutMe, the **id** field is important, and the fields to edit, which are the following:
+    ✅ Mutation updateAboutMe: To edit a AboutMe, the **id** field is important, and the fields to edit, which are the following:
      **firstName**, **lastName**, **profession**, **linkUsername**, **aboutMeText**.
      **myPharse**, **socialNetworks**, **photo**, **coverImage**,
     If the edition was correct the answer is the object that is being edited
@@ -188,6 +231,113 @@ const typeDefs = gql`
       "id: The id is unique for a user and is type string"
       id: String!
     ): AboutMe
+    # Proyect-----------------------------------------------------------------------
+    """
+    ✅ Mutation addProyect: To add a aboutMe it is important to send the following fields
+    **id**, **userId**, **proyectName**, **proyectType**, **description**,
+    **startDate**, **endDate**, **linkDemo**, **linkRepo**, **imageProyect**
+     The response from addUser is the object created in the database
+    """
+    addProyect(
+      "userId: The userId is unique for a user and is type string"
+      userId: String!
+      "proyectName:is the name of the project, is of type string and cannot be null"
+      proyectName: String!
+      "proyectType is the type of the project, is of type string and cannot be null"
+      proyectType: String!
+      "description: description of the project carried out, it is of type string and cannot be null"
+      description: String!
+      "startDate: project start date, is of type string, if it can be null"
+      startDate: String!
+      "endDate: project end date, is of type string, if it can be null"
+      endDate: String!
+      "linkDemo: demo link of the project, is of type string, if it can be null"
+      linkDemo: String!
+      "linkRepo: repository link of the project, is of type string, if it can be null"
+      linkRepo: String!
+      "imageProyect: project image, is of type array, if it can be null"
+      imageProyect: String!
+    ): Proyect!
+    # update proyect
+    """
+    ✅ Mutation updateProyect: To edit a Proyect, the **id** field is important, and the fields to edit, which are the following:
+     **firstName**, **lastName**, **profession**, **linkUsername**, **aboutMeText**.
+     **myPharse**, **socialNetworks**, **photo**, **coverImage**,
+    If the edition was correct the answer is the object that is being edited
+    """
+    updateProyect(
+      "id: The id is unique for a user and is type string"
+      id: String!
+      "userId: The userId is unique for a user and is type string"
+      userId: String
+      "proyectName:is the name of the project, is of type string and cannot be null"
+      proyectName: String
+      "proyectType is the type of the project, is of type string and cannot be null"
+      proyectType: String
+      "description: description of the project carried out, it is of type string and cannot be null"
+      description: String
+      "startDate: project start date, is of type string, if it can be null"
+      startDate: String
+      "endDate: project end date, is of type string, if it can be null"
+      endDate: String
+      "linkDemo: demo link of the project, is of type string, if it can be null"
+      linkDemo: String
+      "linkRepo: repository link of the project, is of type string, if it can be null"
+      linkRepo: String
+      "imageProyect: project image, is of type array, if it can be null"
+      imageProyect: String
+    ): Proyect
+    # # delete Proyect
+    """
+    ✅ Mutation deleteProyect: To delete a user the important field is the **id**
+    If the edition was correct the answer is the object that is being deleted
+    """
+    deleteProyect(
+      "id: The id is unique for a user and is type string"
+      id: String!
+    ): Proyect
+
+    # Skill-----------------------------------------------------------------------
+    """
+    ✅ Mutation addSkill: To add a Skill it is important to send the following fields
+     **id**, **userID**, **skillName**, **skillLink**, **imageSkill**
+     The response from addUser is the object created in the database
+    """
+    addSkill(
+      "userId: The userId is unique for a user and is type string"
+      userId: String!
+      "skillName tech skill name, is of type string and cannot be null"
+      skillName: String!
+      "skillLinktech: skill link, is of type string"
+      skillLink: String!
+      "imageSkill: technical skill image, is of type string"
+      imageSkill: String!
+    ): Skill!
+    # update skill
+    """
+    ✅ Mutation updateSkill: To edit a Skill, the **id** field is important, and the fields to edit, which are the following:
+    **userID**, **skillName**, **skillLink**, **imageSkill**
+    If the edition was correct the answer is the object that is being edited
+    """
+    updateSkill(
+      "id: The id is unique for a user and is type string"
+      id: String!
+      "skillName tech skill name, is of type string and cannot be null"
+      skillName: String!
+      "skillLinktech: skill link, is of type string"
+      skillLink: String!
+      "imageSkill: technical skill image, is of type string"
+      imageSkill: String!
+    ): Skill
+    # # delete Skill
+    """
+    ✅ Mutation deleteSkill: To delete a user the important field is the **id**
+    If the edition was correct the answer is the object that is being deleted
+    """
+    deleteSkill(
+      "id: The id is unique for a user and is type string"
+      id: String!
+    ): Proyect
   }
 
   # types Querys
@@ -221,6 +371,26 @@ const typeDefs = gql`
       "userId: The userId is unique for a user and is type string "
       userId: String!
     ): AboutMe
+    # Proyect
+    """
+    ✅ Query getProyectByUser: returns a user object by id, the fields you can select are:
+     **id**, **userId**, **proyectName**, **proyectType**, **description**,
+    **startDate**, **endDate**, **linkDemo**, **linkRepo**, **imageProyect**
+    """
+    getProyectByUser(
+      "userId: The userId is unique for a user and is type string "
+      userId: String!
+    ): [Proyect]
+
+    # Skill
+    """
+    ✅ Query getSkillByUser: returns a user object by id, the fields you can select are:
+     **id**, **userID**, **skillName**, **skillLink**, **imageSkill**
+    """
+    getSkillByUser(
+      "userId: The userId is unique for a user and is type string "
+      userId: String!
+    ): [Skill]
   }
 `;
 

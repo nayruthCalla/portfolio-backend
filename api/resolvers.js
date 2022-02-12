@@ -3,6 +3,8 @@ const { ApolloError } = require('apollo-server-express');
 // const { ApolloError } = require('apollo-server-errors');
 const User = require('./users/user.model');
 const AboutMe = require('./about/about.model');
+const Proyect = require('./proyects/proyect.model');
+const Skill = require('./skills/proyect.model');
 const services = require('./servicesDB');
 const servicesDb = services();
 const resolvers = {
@@ -107,6 +109,89 @@ const resolvers = {
       }
     },
     // Proyect
+    addProyect: async (
+      _,
+      {
+        userId,
+        proyectName,
+        proyectType,
+        description,
+        startDate,
+        endDate,
+        linkDemo,
+        linkRepo,
+        imageProyect,
+      }
+    ) => {
+      try {
+        const createProyect = servicesDb.createDocument(Proyect, {
+          userId: userId,
+          proyectName: proyectName,
+          proyectType: proyectType,
+          description: description,
+          startDate: startDate,
+          endDate: endDate,
+          linkDemo: linkDemo,
+          linkRepo: linkRepo,
+          imageProyect: imageProyect,
+        });
+        return createProyect;
+      } catch (err) {
+        return err;
+      }
+    },
+    updateProyect: async (_, { id, ...data }) => {
+      try {
+        const editedProyect = await servicesDb.updateDocument(
+          Proyect,
+          id,
+          data
+        );
+        return editedProyect;
+      } catch (err) {
+        return err;
+      }
+    },
+    deleteProyect: async (_, { id }) => {
+      try {
+        console.log(id);
+        const deletedProyect = await servicesDb.deleteDocument(Proyect, id);
+        return deletedProyect;
+      } catch (err) {
+        return err;
+      }
+    },
+    // Skill
+    addSkill: async (_, { userId, skillName, skillLink, imageSkill }) => {
+      try {
+        const createSkill = servicesDb.createDocument(Skill, {
+          userId: userId,
+          skillName: skillName,
+          skillLink: skillLink,
+          imageSkill: imageSkill,
+        });
+        return createSkill;
+      } catch (err) {
+        return err;
+      }
+    },
+    updateSkill: async (_, { id, ...data }) => {
+      try {
+        const editedSkill = await servicesDb.updateDocument(Skill, id, data);
+        return editedSkill;
+      } catch (err) {
+        return err;
+      }
+    },
+    deleteSkill: async (_, { id }) => {
+      try {
+        console.log(id);
+        const deletedProyect = await servicesDb.deleteDocument(Skill, id);
+        return deletedProyect;
+      } catch (err) {
+        return err;
+      }
+    },
   },
   Query: {
     // users
@@ -132,7 +217,29 @@ const resolvers = {
       try {
         // console.log(userId);
         const aboutMe = await servicesDb.getDocumentByUser(AboutMe, userId);
+        return aboutMe[0];
+      } catch (err) {
+        console.Console('lili');
+        return err;
+      }
+    },
+    // Proyect
+    getProyectByUser: async (_, { userId }) => {
+      try {
+        // console.log(userId);
+        const aboutMe = await servicesDb.getDocumentByUser(Proyect, userId);
         return aboutMe;
+      } catch (err) {
+        console.Console('lili');
+        return err;
+      }
+    },
+    // Skill
+    getSkillByUser: async (_, { userId }) => {
+      try {
+        // console.log(userId);
+        const skills = await servicesDb.getDocumentByUser(Skill, userId);
+        return skills;
       } catch (err) {
         console.Console('lili');
         return err;
