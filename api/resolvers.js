@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const { ApolloError } = require('apollo-server-express');
+require('dotenv').config();
 // const { ApolloError } = require('apollo-server-errors');
 const User = require('./users/user.model');
 const AboutMe = require('./about/about.model');
@@ -7,32 +8,52 @@ const Proyect = require('./proyects/proyect.model');
 const Skill = require('./skills/proyect.model');
 const services = require('./servicesDB');
 const servicesDb = services();
+const jwtAction = require('./auth');
 const resolvers = {
   Mutation: {
-    addUser: async (_, { fullName, userName, email, photo }) => {
-      const userExistsByEmail = await servicesDb.existsByEmail(User, email);
-      const userExistsByUserName = await servicesDb.existsByUsername(
+    addUser: async (_, { name, nickname, email, picture }) => {
+      // const userExistsByEmail = await servicesDb.existsByEmail(User, nickname);
+      if (!nickname) {
+        throw new ApolloError('The nickname it can not be null');
+      }
+      const userExistsByNickName = await servicesDb.existsByNickname(
         User,
-        userName
+        nickname
       );
       // console.log(userExistsByEmail, userExistsByUserName);
-      if (userExistsByEmail === 'null') {
-        throw new ApolloError('The email already exists');
-      }
-      if (userExistsByUserName === 'null') {
-        throw new ApolloError('The userName already exists');
+      // if (userExistsByEmail === 'null') {
+      //   console.log('existe el usuario');
+      //   throw new ApolloError('The email already exists');
+      // }
+      if (userExistsByNickName) {
+        // console.log('existe el username', userExistsByNickName);
+        const token = jwtAction.createToken(
+          userExistsByNickName,
+          process.env.SECRET,
+          '24h'
+        );
+        // console.log('mi token', token);
+        // throw new ApolloError('The nickname already exists');
+        return { token: token };
       }
       try {
-        const createUser = servicesDb.createDocument(User, {
-          fullName: fullName,
-          userName: userName,
+        // console.log('voya crearme');
+        const createUser = await servicesDb.createDocument(User, {
+          name: name,
+          nickname: nickname,
           email: email,
-          photo: photo,
+          picture: picture,
           roles: {
             admin: false,
           },
         });
-        return createUser;
+        console.log(createUser);
+        const token = jwtAction.createToken(
+          createUser,
+          process.env.SECRET,
+          '24h'
+        );
+        return { token: token };
       } catch (err) {
         return err;
       }
@@ -195,6 +216,11 @@ const resolvers = {
   },
   Query: {
     // users
+
+    getUserByToken: async (_, { token }) => {
+      const user = await jwtAction.getUser(token, process.env.SECRET);
+      return user;
+    },
     getUsers: async () => {
       try {
         const allUsers = await servicesDb.getAllDocument(User);

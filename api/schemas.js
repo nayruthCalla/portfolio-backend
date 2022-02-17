@@ -3,6 +3,11 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   # Custom types
+  "✅ user token is unique for a user and is type string"
+  type Token {
+    "The admin field is boolean type can be false or true"
+    token: String! # returns a String,
+  }
   "✅ user role if admin is true if not false"
   type RolUser {
     "The admin field is boolean type can be false or true"
@@ -29,17 +34,17 @@ const typeDefs = gql`
   """
   type User {
     "id: The id is unique for a user and is type string"
-    id: String!
-    "fullName is the full name of the user, is of type string and cannot be null"
-    fullName: String!
-    "username is the username in the App, is of type string and cannot be null and is unique"
-    userName: String!
+    id: ID!
+    "name is the full name of the user, is of type string and cannot be null"
+    name: String
+    "nickname is the username in the App, is of type string and cannot be null and is unique"
+    nickname: String!
     "email is the user's email in the App, is of type string and cannot be null and is unique"
-    email: String!
+    email: String
     "roles is the role that the user has in the App, is of object type and cannot be null, it has admin as property and this property is a boolean type"
     roles: RolUser!
     "photo is the profile photo of the user in the App, is of type string, if it can be null"
-    photo: String
+    picture: String
   }
 
   """
@@ -128,14 +133,14 @@ const typeDefs = gql`
     """
     addUser(
       "fullName is the full name of the user, is of type string and cannot be null"
-      fullName: String!
+      name: String
       "userName is the username in the App, is of type string and cannot be null and is unique"
-      userName: String!
+      nickname: String!
       "email is the user's email in the App, is of type string and cannot be null and is unique"
-      email: String!
+      email: String
       "photo is the profile photo of the user in the App, is of type string, if it can be null"
-      photo: String
-    ): User!
+      picture: String
+    ): Token!
     # update User
     """
     ✅ Mutation updateUser: To edit a user, the **id** field is important, and the fields to edit, which are the following:
@@ -347,6 +352,12 @@ const typeDefs = gql`
   """
   type Query {
     # users
+
+    """
+    ✅ Query getUsers: returns an array of users the fields you can select are:
+    **id**,**fullname**, **userName**, **email**, **roles**, **photo**.
+    """
+    getUserByToken(token: String!): User # This user type has six fields: id, fullname, username, email, roles, photo
     """
     ✅ Query getUsers: returns an array of users the fields you can select are:
     **id**,**fullname**, **userName**, **email**, **roles**, **photo**.

@@ -14,12 +14,12 @@ module.exports = () => ({
       return err;
     }
   },
-  existsByUsername: async (model, userName) => {
+  existsByNickname: async (model, nickname) => {
     try {
-      const userExists = await model.exists({ userName });
-      if (userExists) {
-        return 'null';
-      }
+      const userExists = await model.findOne({ nickname });
+      // if (userExists) {
+      //   return userExists;
+      // }
       return userExists;
     } catch (err) {
       return err;
