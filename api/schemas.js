@@ -260,12 +260,8 @@ const typeDefs = gql`
       id: String!
       "firstName: is the first name of the user, in the web portfolio, is of type string and cannot be null"
       firstName: String
-      "lastName: is the last name of the user, in the web portfolio, is of type string and cannot be null and is unique"
-      lastName: String
       "profession: is the user's profession, is of type string and cannot be null and is unique"
       profession: String
-      "linkUsername:is the link of the user's web portfolio, is of type string, if it can be null"
-      linkUsername: String
       "aboutMeText: is the user description, is of type string, if it can be null"
       aboutMeText: String
       "interests: things the user is interested in now, is of type string, if it can be null"
@@ -456,6 +452,8 @@ const typeDefs = gql`
       id: String!
     ): User
 
+    getUserByIdAbout: [User]
+
     getUser: User
 
     # About Me
@@ -469,7 +467,7 @@ const typeDefs = gql`
       userName: ID!
     ): AboutMe
 
-    getAboutMe: AboutMe
+    getAboutMe: [AboutMe]
     # Proyect
     """
     ✅ Query getProyectByUser: returns a user object by id, the fields you can select are:

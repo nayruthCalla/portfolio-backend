@@ -4,7 +4,6 @@ const connectDB = require('./config/database');
 const { ApolloServer } = require('apollo-server-express');
 const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
 
-// const { typeDefs, resolvers } = require("./schema");
 const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const http = require('http');
