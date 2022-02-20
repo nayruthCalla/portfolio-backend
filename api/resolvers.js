@@ -1,18 +1,17 @@
 /* eslint-disable no-prototype-builtins */
 const { ApolloError } = require('apollo-server-express');
 require('dotenv').config();
-// const { ApolloError } = require('apollo-server-errors');
 const User = require('./users/user.model');
 const AboutMe = require('./about/about.model');
 const Proyect = require('./proyects/proyect.model');
 const Skill = require('./skills/proyect.model');
+const Logros = require('./Logros/logros.model');
 const services = require('./servicesDB');
 const servicesDb = services();
 const jwtAction = require('./auth');
 const resolvers = {
   Mutation: {
     addUser: async (_, { name, nickname, email, picture }) => {
-      // const userExistsByEmail = await servicesDb.existsByEmail(User, nickname);
       if (!nickname) {
         throw new ApolloError('The nickname it can not be null');
       }
@@ -20,20 +19,13 @@ const resolvers = {
         User,
         nickname
       );
-      // console.log(userExistsByEmail, userExistsByUserName);
-      // if (userExistsByEmail === 'null') {
-      //   console.log('existe el usuario');
-      //   throw new ApolloError('The email already exists');
-      // }
       if (userExistsByNickName) {
-        // console.log('existe el username', userExistsByNickName);
         const token = jwtAction.createToken(
           userExistsByNickName,
           process.env.SECRET,
           '24h'
         );
-        // console.log('mi token', token);
-        // throw new ApolloError('The nickname already exists');
+
         return { token: token };
       }
       try {
@@ -58,10 +50,48 @@ const resolvers = {
         return err;
       }
     },
-    updateUser: async (_, { id, ...data }) => {
+    updateUser: async (
+      _,
+      { userName, name, nickname, email, picture },
+      context
+    ) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const editedUser = await servicesDb.updateDocument(User, id, data);
-        return editedUser;
+        const exitUsername = await servicesDb.existsByUserName(User, userName);
+        // console.log(exitUsername);
+        if (exitUsername) {
+          throw new ApolloError('Eser name already existsx');
+        }
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        // console.log(context.user._id);
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const editedUser = await servicesDb.updateDocument(
+            User,
+            context.user._id,
+            {
+              userName: userName,
+              name: name,
+              nickname: nickname,
+              email: email,
+              picture: picture,
+              roles: {
+                admin: false,
+              },
+            }
+          );
+          return editedUser;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
@@ -78,44 +108,97 @@ const resolvers = {
     addAboutMe: async (
       _,
       {
-        userId,
         firstName,
         lastName,
         profession,
         linkUsername,
         aboutMeText,
-        myPharse,
+        interests,
         socialNetworks,
         photo,
         coverImage,
-      }
+      },
+      context
     ) => {
+      // console.log(context.user);
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const createAboutMe = servicesDb.createDocument(AboutMe, {
-          userId: userId,
-          firstName: firstName,
-          lastName: lastName,
-          profession: profession,
-          linkUsername: linkUsername,
-          aboutMeText: aboutMeText,
-          myPharse: myPharse,
-          socialNetworks: socialNetworks,
-          photo: photo,
-          coverImage: coverImage,
-        });
-        return createAboutMe;
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const createAboutMe = servicesDb.createDocument(AboutMe, {
+            userId: context.user._id,
+            userName: userDB.userName,
+            firstName: firstName,
+            lastName: lastName,
+            profession: profession,
+            linkUsername: linkUsername,
+            aboutMeText: aboutMeText,
+            interests: interests,
+            socialNetworks: socialNetworks,
+            photo: photo,
+            coverImage: coverImage,
+          });
+          return createAboutMe;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
     },
-    updateAboutMe: async (_, { id, ...data }) => {
+    updateAboutMe: async (
+      _,
+      {
+        id,
+        firstName,
+        lastName,
+        profession,
+        linkUsername,
+        aboutMeText,
+        interests,
+        socialNetworks,
+        photo,
+        coverImage,
+      },
+      context
+    ) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const editedAboutMe = await servicesDb.updateDocument(
-          AboutMe,
-          id,
-          data
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
         );
-        return editedAboutMe;
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const editedAboutMe = await servicesDb.updateDocument(AboutMe, id, {
+            firstName: firstName,
+            lastName: lastName,
+            profession: profession,
+            linkUsername: linkUsername,
+            aboutMeText: aboutMeText,
+            interests: interests,
+            socialNetworks: socialNetworks,
+            photo: photo,
+            coverImage: coverImage,
+          });
+          return editedAboutMe;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
@@ -130,85 +213,267 @@ const resolvers = {
       }
     },
     // Proyect
-    addProyect: async (
-      _,
-      {
-        userId,
-        proyectName,
-        proyectType,
-        description,
-        startDate,
-        endDate,
-        linkDemo,
-        linkRepo,
-        imageProyect,
+    addArrProyects: async (_, { proyects }, context) => {
+      // console.log(proyects);
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
       }
-    ) => {
       try {
-        const createProyect = servicesDb.createDocument(Proyect, {
-          userId: userId,
-          proyectName: proyectName,
-          proyectType: proyectType,
-          description: description,
-          startDate: startDate,
-          endDate: endDate,
-          linkDemo: linkDemo,
-          linkRepo: linkRepo,
-          imageProyect: imageProyect,
-        });
+        const createProyect = servicesDb.createDocuments(Proyect, proyects);
+        console.log(createProyect);
         return createProyect;
       } catch (err) {
         return err;
       }
     },
-    updateProyect: async (_, { id, ...data }) => {
+    addProyect: async (
+      _,
+      {
+        proyectName,
+        level,
+        description,
+        techFirst,
+        techSecond,
+        links,
+        imageProyect,
+      },
+      context
+    ) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const editedProyect = await servicesDb.updateDocument(
-          Proyect,
-          id,
-          data
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
         );
-        return editedProyect;
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const createProyect = servicesDb.createDocument(Proyect, {
+            userId: context.user._id,
+            userName: userDB.userName,
+            proyectName: proyectName,
+            level: level,
+            description: description,
+            techFirst: techFirst,
+            techSecond: techSecond,
+            links: links,
+            imageProyect: imageProyect,
+          });
+          return createProyect;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
     },
-    deleteProyect: async (_, { id }) => {
+    updateProyect: async (
+      _,
+      {
+        id,
+        // userId,
+        proyectName,
+        level,
+        description,
+        techFirst,
+        techSecond,
+        links,
+        imageProyect,
+      },
+      context
+    ) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        console.log(id);
+        const proyect = await servicesDb.getDocumentById(Proyect, id);
+        if (
+          proyect.userId.userId === context.user._id ||
+          proyect.userId.roles.admin === context.user.roles.admin
+        ) {
+          const editedProyect = await servicesDb.updateDocument(Proyect, id, {
+            userId: context.user._id,
+            proyectName: proyectName,
+            level: level,
+            description: description,
+            techFirst: techFirst,
+            techSecond: techSecond,
+            links: links,
+            imageProyect: imageProyect,
+          });
+          return editedProyect;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
+      } catch (err) {
+        return err;
+      }
+    },
+
+    deleteProyect: async (_, { id }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      const proyect = await servicesDb.getDocumentById(Proyect, id);
+      if (
+        proyect.userId.userId === context.user._id ||
+        proyect.userId.roles.admin === context.user.roles.admin
+      ) {
         const deletedProyect = await servicesDb.deleteDocument(Proyect, id);
         return deletedProyect;
-      } catch (err) {
-        return err;
       }
+      throw new ApolloError(
+        'You are not authorized because it is not the same user'
+      );
     },
     // Skill
-    addSkill: async (_, { userId, skillName, skillLink, imageSkill }) => {
+    addSkill: async (_, { skillName }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const createSkill = servicesDb.createDocument(Skill, {
-          userId: userId,
-          skillName: skillName,
-          skillLink: skillLink,
-          imageSkill: imageSkill,
-        });
-        return createSkill;
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const createSkill = servicesDb.createDocument(Skill, {
+            userId: context.user._id,
+            userName: userDB.userName,
+            skillName: skillName,
+          });
+          return createSkill;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
     },
-    updateSkill: async (_, { id, ...data }) => {
+    updateSkill: async (_, { id, skillName }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        const editedSkill = await servicesDb.updateDocument(Skill, id, data);
-        return editedSkill;
+        const skill = await servicesDb.getDocumentById(Skill, id);
+        if (
+          skill.userId.userId === context.user._id ||
+          skill.userId.roles.admin === context.user.roles.admin
+        ) {
+          const editedSkill = await servicesDb.updateDocument(Skill, id, {
+            skillName: skillName,
+          });
+          console.log(editedSkill);
+          return editedSkill;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
     },
-    deleteSkill: async (_, { id }) => {
+    deleteSkill: async (_, { id }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        console.log(id);
-        const deletedProyect = await servicesDb.deleteDocument(Skill, id);
-        return deletedProyect;
+        const skill = await servicesDb.getDocumentById(Skill, id);
+        if (
+          skill.userId.userId === context.user._id ||
+          skill.userId.roles.admin === context.user.roles.admin
+        ) {
+          const deletedProyect = await servicesDb.deleteDocument(Skill, id);
+          return deletedProyect;
+        }
+        // console.log(id);
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
+      } catch (err) {
+        return err;
+      }
+    },
+
+    // Logros
+    addLogros: async (_, { title, description }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        if (
+          userDB._id === context.user._id ||
+          userDB.roles.admin === context.user.roles.admin
+        ) {
+          const createLogros = servicesDb.createDocument(Logros, {
+            userId: context.user._id,
+            userName: userDB.userName,
+            title: title,
+            description: description,
+          });
+          return createLogros;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
+      } catch (err) {
+        return err;
+      }
+    },
+    updateLogros: async (_, { id, title, description }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        const logros = await servicesDb.getDocumentById(Logros, id);
+        if (
+          logros.userId.userId === context.user._id ||
+          logros.userId.roles.admin === context.user.roles.admin
+        ) {
+          const editedLogros = await servicesDb.updateDocument(Logros, id, {
+            title: title,
+            description: description,
+          });
+          console.log(editedLogros);
+          return editedLogros;
+        }
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
+      } catch (err) {
+        return err;
+      }
+    },
+    deleteLogros: async (_, { id }, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        const logros = await servicesDb.getDocumentById(Logros, id);
+        if (
+          logros.userId.userId === context.user._id ||
+          logros.userId.roles.admin === context.user.roles.admin
+        ) {
+          const deletedProyect = await servicesDb.deleteDocument(Logros, id);
+          return deletedProyect;
+        }
+        // console.log(id);
+        throw new ApolloError(
+          'You are not authorized because it is not the same user'
+        );
       } catch (err) {
         return err;
       }
@@ -220,6 +485,23 @@ const resolvers = {
     getUserByToken: async (_, { token }) => {
       const user = await jwtAction.getUser(token, process.env.SECRET);
       return user;
+    },
+    getUser: async (_, args, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        const userDB = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        if (!userDB) {
+          throw new ApolloError('Not exists user');
+        }
+        return userDB;
+      } catch (err) {
+        return err;
+      }
     },
     getUsers: async () => {
       try {
@@ -239,35 +521,100 @@ const resolvers = {
       }
     },
     // About
-    getAboutMeByUser: async (_, { userId }) => {
+    getAboutMeByUserName: async (_, { userName }) => {
       try {
         // console.log(userId);
-        const aboutMe = await servicesDb.getDocumentByUser(AboutMe, userId);
+        const aboutMe = await servicesDb.getDocumentByIdUserName(
+          AboutMe,
+          userName
+        );
+        console.log(aboutMe);
         return aboutMe[0];
       } catch (err) {
-        console.Console('lili');
+        // console.Console('');
+        return err;
+      }
+    },
+    getAboutMe: async (_, agrs, context) => {
+      // console.log('');
+      // console.log('hola fuer');
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        const about = await servicesDb.getDocumentByUser(
+          AboutMe,
+          context.user._id
+        );
+        // console.log(about, 'user');
+        if (!about) {
+          console.log('if av');
+          return {};
+        }
+        return about[0];
+      } catch (err) {
+        // console.Console('');
         return err;
       }
     },
     // Proyect
-    getProyectByUser: async (_, { userId }) => {
+    getProyectByUser: async (_, agrs, context) => {
+      // console.log('');
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
-        // console.log(userId);
-        const aboutMe = await servicesDb.getDocumentByUser(Proyect, userId);
-        return aboutMe;
+        const proyect = await servicesDb.getDocumentByUser(
+          Proyect,
+          context.user._id
+        );
+        // console.log(proyect);
+        if (!proyect) {
+          return [];
+        }
+        return proyect;
       } catch (err) {
-        console.Console('lili');
+        // console.Console('');
         return err;
       }
     },
     // Skill
-    getSkillByUser: async (_, { userId }) => {
+    getSkillByUser: async (_, args, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
       try {
         // console.log(userId);
-        const skills = await servicesDb.getDocumentByUser(Skill, userId);
+        const skills = await servicesDb.getDocumentByUser(
+          Skill,
+          context.user._id
+        );
+        if (!skills) {
+          return [];
+        }
         return skills;
       } catch (err) {
-        console.Console('lili');
+        // console.Console('');
+        return err;
+      }
+    },
+    // Logros
+    getLogrosByUser: async (_, args, context) => {
+      if (!context.user) {
+        throw new ApolloError('I should have a token');
+      }
+      try {
+        // console.log(userId);
+        const logros = await servicesDb.getDocumentByUser(
+          Logros,
+          context.user._id
+        );
+        if (!logros) {
+          return [];
+        }
+        return logros;
+      } catch (err) {
+        // console.Console('');
         return err;
       }
     },

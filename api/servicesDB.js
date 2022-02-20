@@ -25,6 +25,30 @@ module.exports = () => ({
       return err;
     }
   },
+  existsByUserName: async (model, userName) => {
+    try {
+      const userExists = await model.findOne({ userName });
+      // if (userExists) {
+      //   return userExists;
+      // }
+      return userExists;
+    } catch (err) {
+      return err;
+    }
+  },
+  createDocuments: async (model, data) => {
+    console.log('crear documents', data);
+    try {
+      console.log('try documents', data);
+      // const newCollection = new model(data);
+      const savedCollection = await model.create(data); // await newCollection.save();
+      console.log(savedCollection);
+      return savedCollection;
+    } catch (err) {
+      console.log('elorr', err);
+      return err;
+    }
+  },
   createDocument: async (model, data) => {
     console.log('crear', data);
     try {
@@ -40,8 +64,26 @@ module.exports = () => ({
   },
   getDocumentById: async (model, id) => {
     try {
+      const userById = await model
+        .findById(id)
+        .populate({ path: 'userId', select: 'nickname roles userName' });
+      return userById;
+    } catch (err) {
+      return err;
+    }
+  },
+  getDocumentByIdUser: async (model, id) => {
+    try {
       const userById = await model.findById(id);
       return userById;
+    } catch (err) {
+      return err;
+    }
+  },
+  getDocumentByIdUserName: async (model, userName) => {
+    try {
+      const document = await model.find({ userName: userName });
+      return document;
     } catch (err) {
       return err;
     }

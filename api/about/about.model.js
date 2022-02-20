@@ -9,6 +9,11 @@ const AboutSchema = new mongoose.Schema({
     // Revisar si se requiere o no
     required: false,
   },
+  userName: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   firstName: {
     type: String,
     required: true,
@@ -16,7 +21,7 @@ const AboutSchema = new mongoose.Schema({
   },
   lastName: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
     lowercase: true,
   },
@@ -36,7 +41,7 @@ const AboutSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  myPharse: {
+  interests: {
     type: String,
     required: true,
     trim: true,

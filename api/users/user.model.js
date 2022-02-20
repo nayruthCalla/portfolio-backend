@@ -6,6 +6,12 @@ const UserSchema = new mongoose.Schema({
     required: false,
     trim: true,
   },
+  userName: {
+    type: String,
+    required: false,
+    trim: true,
+    default: 'undefined',
+  },
   nickname: {
     type: String,
     required: true,

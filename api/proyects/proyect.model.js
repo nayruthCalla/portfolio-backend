@@ -9,12 +9,17 @@ const ProyectSchema = new mongoose.Schema({
     // Revisar si se requiere o no
     required: false,
   },
+  userName: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   proyectName: {
     type: String,
     required: true,
     trim: true,
   },
-  proyectType: {
+  level: {
     type: String,
     required: true,
     trim: true,
@@ -31,17 +36,17 @@ const ProyectSchema = new mongoose.Schema({
     required: false,
     trim: true,
   },
-  endDate: {
+  techFirst: {
     type: String,
     required: true,
     trim: true,
   },
-  linkDemo: {
+  techSecond: {
     type: String,
     required: true,
     trim: true,
   },
-  linkRepo: {
+  links: {
     type: Array,
     required: false,
   },
