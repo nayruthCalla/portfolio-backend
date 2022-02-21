@@ -611,11 +611,15 @@ const resolvers = {
       }
       try {
         // console.log(userId);
-        const user = await servicesDb.getDocumentByUser(User, context.user._id);
+        const user = await servicesDb.getDocumentByIdUser(
+          User,
+          context.user._id
+        );
+        console.log(user, context.user._id);
         if (!user) {
           return [];
         }
-        return user;
+        return [user];
       } catch (err) {
         // console.Console('');
         return err;
