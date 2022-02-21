@@ -18,10 +18,7 @@ async function startApolloServer() {
     res.json({ name: pkg.name, version: pkg.version })
   );
   const server = new ApolloServer({
-    cors: {
-      origin: '*', // <- allow request from all domains
-      credentials: true,
-    },
+    cors: true,
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
