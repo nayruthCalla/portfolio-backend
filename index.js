@@ -20,7 +20,6 @@ async function startApolloServer() {
     res.json({ name: pkg.name, version: pkg.version })
   );
   const server = new ApolloServer({
-    cors: true,
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
@@ -37,7 +36,12 @@ async function startApolloServer() {
     },
     introspection: true, // process.env.NODE_ENV !== 'production',
   });
-
+  // await server.createHandler({
+  //   cors: {
+  //     origin: '*',
+  //     credentials: true,
+  //   },
+  // });
   await server.start();
   connectDB();
 
