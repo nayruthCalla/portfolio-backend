@@ -486,6 +486,11 @@ const typeDefs = gql`
      **id**, **userID**, **link**, **description**
     """
     getLogrosByUser: [Logros]
+
+    getProfileUserAbout(userName: ID!): [AboutMe]
+    getProfileUserProyect(userName: ID!): [Proyect]
+    getProfileUserSkill(userName: ID!): [Skill]
+    getProfileUserLogros(userName: ID!): [Logros]
   }
 `;
 

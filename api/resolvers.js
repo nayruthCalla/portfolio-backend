@@ -641,6 +641,74 @@ const resolvers = {
         return err;
       }
     },
+    getProfileUserAbout: async (_, { userName }) => {
+      try {
+        // console.log(userId);
+        const aboutMe = await servicesDb.getDocumentByIdUserName(
+          AboutMe,
+          userName
+        );
+        if (!aboutMe) {
+          return [];
+        }
+        // console.log(aboutMe);
+        return aboutMe;
+      } catch (err) {
+        // console.Console('');
+        return err;
+      }
+    },
+    getProfileUserProyect: async (_, { userName }) => {
+      try {
+        // console.log(userId);
+        const aboutMe = await servicesDb.getDocumentByIdUserName(
+          Proyect,
+          userName
+        );
+        if (!aboutMe) {
+          return [];
+        }
+        // console.log(aboutMe);
+        return aboutMe;
+      } catch (err) {
+        // console.Console('');
+        return err;
+      }
+    },
+    getProfileUserSkill: async (_, { userName }) => {
+      try {
+        // console.log(userId);
+        const aboutMe = await servicesDb.getDocumentByIdUserName(
+          Skill,
+          userName
+        );
+        if (!aboutMe) {
+          return [];
+        }
+        // console.log(aboutMe);
+        return aboutMe;
+      } catch (err) {
+        // console.Console('');
+        return err;
+      }
+    },
+    getProfileUserLogros: async (_, { userName }) => {
+      try {
+        // console.log(userId);
+        const aboutMe = await servicesDb.getDocumentByIdUserName(
+          Logros,
+          userName
+        );
+        if (!aboutMe) {
+          return [];
+        }
+        // console.log(aboutMe);
+        return aboutMe;
+      } catch (err) {
+        // console.Console('');
+        return err;
+      }
+    },
   },
 };
 
