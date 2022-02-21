@@ -493,6 +493,7 @@ const resolvers = {
       return user;
     },
     getUser: async (_, args, context) => {
+      console.log('hola', context);
       if (!context.user) {
         throw new ApolloError('I should have a token');
       }
