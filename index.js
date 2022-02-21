@@ -1,5 +1,6 @@
 const express = require('express');
 require('dotenv').config();
+const cors = require('cors');
 const connectDB = require('./config/database');
 const { ApolloServer } = require('apollo-server-express');
 const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
@@ -13,6 +14,7 @@ const { ApolloError } = require('apollo-server-express');
 
 async function startApolloServer() {
   const app = express();
+  app.use(cors());
   const httpServer = http.createServer(app);
   app.get('/', (req, res) =>
     res.json({ name: pkg.name, version: pkg.version })
