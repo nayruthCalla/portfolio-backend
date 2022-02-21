@@ -3,6 +3,7 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const { ApolloServer } = require('apollo-server-express');
 const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
+const pkg = require('./package.json');
 
 const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
@@ -13,6 +14,9 @@ const { ApolloError } = require('apollo-server-express');
 async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
+  app.get('/', (req, res) =>
+    res.json({ name: pkg.name, version: pkg.version })
+  );
   const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -35,7 +39,9 @@ async function startApolloServer() {
   connectDB();
 
   server.applyMiddleware({ app });
-  await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
+  await new Promise((resolve) =>
+    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+  );
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
   return { server, app };
 }
