@@ -6,7 +6,7 @@ const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const jwtAction = require('./api/auth');
 const { ApolloError } = require('apollo-server-express');
-const { createPaymentIntent } = require('./api/payment');
+const { createPaymentIntent } = require('./api/payment/index');
 
 async function startServer() {
   const app = express();
