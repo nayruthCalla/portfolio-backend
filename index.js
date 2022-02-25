@@ -34,7 +34,7 @@ async function startServer() {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.applyMiddleware({ app });
 
   app.use((req, res) => {
     res.send('Hello world!');
