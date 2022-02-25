@@ -6,13 +6,13 @@ const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const jwtAction = require('./api/auth');
 const { ApolloError } = require('apollo-server-express');
-const { createPaymentIntent } = require('./api/payment/index');
+// const { createPaymentIntent } = require('./api/payment/index');
 
 async function startServer() {
   const app = express();
   app.use(cors());
   app.get('/', (req, res) => res.json({ name: 'Portfolio' }));
-  app.post('/create-checkout-session', createPaymentIntent);
+  // app.post('/create-checkout-session', createPaymentIntent);
 
   connectDB();
 
@@ -39,10 +39,10 @@ async function startServer() {
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: {
-      origin: '*',
-      credentials: true,
-    },
+    // cors: {
+    //   origin: '*',
+    //   credentials: true,
+    // },
   });
 
   // app.use((req, res) => {
