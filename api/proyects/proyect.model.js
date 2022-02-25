@@ -28,7 +28,6 @@ const ProyectSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
   },
   startDate: {
     type: String,
