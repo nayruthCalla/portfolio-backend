@@ -20,6 +20,10 @@ async function startServer() {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
+    cors: {
+      origin: '*',
+      credentials: true,
+    },
     context: async ({ req }) => {
       const token = req.headers.authorization || '';
       // console.log(token);
