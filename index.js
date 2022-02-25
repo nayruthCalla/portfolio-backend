@@ -18,11 +18,11 @@ async function startApolloServer() {
   app.get('/', (req, res) =>
     res.json({ name: pkg.name, version: pkg.version })
   );
-  const corsOptions = {
-    origin: process.env.FRONTEND_URL,
-    credentials: true, // <-- REQUIRED backend setting
-  };
-  app.use(cors(corsOptions));
+  // const corsOptions = {
+  //   origin: process.env.FRONTEND_URL,
+  //   credentials: true, // <-- REQUIRED backend setting
+  // };
+  app.use(cors());
   const server = new ApolloServer({
     cors: false,
     typeDefs,
