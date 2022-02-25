@@ -6,9 +6,12 @@ const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const jwtAction = require('./api/auth');
 const { ApolloError } = require('apollo-server-express');
+const { createPaymentIntent } = require('./api/payment');
 
 async function startServer() {
   const app = express();
+  app.get('/', (req, res) => res.json({ name: 'Portfolio' }));
+  app.post('/create-checkout-session', createPaymentIntent);
 
   connectDB();
 
@@ -36,9 +39,9 @@ async function startServer() {
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
 
-  app.use((req, res) => {
-    res.send('Hello world!');
-  });
+  // app.use((req, res) => {
+  //   res.send('Hello world!');
+  // });
 
   app.listen({ port: 4000 }, () =>
     console.log(`🚀 Server ready at http://localhost:4000/graphql`)
