@@ -3,7 +3,7 @@ const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const conectarDB = require('./config/database');
 const jwtAction = require('./api/auth');
-//Servidor
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -12,7 +12,6 @@ const server = new ApolloServer({
     // console.log(token);
 
     if (token !== '') {
-      console.log(token, '15');
       const user = await jwtAction.getUser(token, process.env.SECRET);
       console.log(user, 'user');
       if (!user) throw new ApolloError('you must be logged in');
