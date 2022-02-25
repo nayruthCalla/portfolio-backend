@@ -1,7 +1,7 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const connectDB = require('./config/database');
-
+const cors = require('cors');
 const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
 const jwtAction = require('./api/auth');
@@ -13,7 +13,7 @@ async function startServer() {
   connectDB();
 
   console.log('Connected to MongoDB');
-
+  app.use(cors());
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
@@ -34,7 +34,7 @@ async function startServer() {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.use((req, res) => {
     res.send('Hello world!');
