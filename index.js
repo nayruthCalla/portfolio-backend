@@ -1,33 +1,22 @@
 const express = require('express');
-require('dotenv').config();
-const cors = require('cors');
-const connectDB = require('./config/database');
 const { ApolloServer } = require('apollo-server-express');
-const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
-const pkg = require('./package.json');
+const connectDB = require('./config/database');
 
 const typeDefs = require('./api/schemas');
 const resolvers = require('./api/resolvers');
-const http = require('http');
 const jwtAction = require('./api/auth');
 const { ApolloError } = require('apollo-server-express');
 
-async function startApolloServer() {
+async function startServer() {
   const app = express();
-  const httpServer = http.createServer(app);
-  app.get('/', (req, res) =>
-    res.json({ name: pkg.name, version: pkg.version })
-  );
-  // const corsOptions = {
-  //   origin: new URL(process.env.FRONTEND_URL).origin,
-  //   credentials: true, // <-- REQUIRED backend setting
-  // };
-  app.use(cors());
-  const server = new ApolloServer({
-    cors: false,
+
+  connectDB();
+
+  console.log('Connected to MongoDB');
+
+  const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     context: async ({ req }) => {
       const token = req.headers.authorization || '';
       // console.log(token);
@@ -42,25 +31,18 @@ async function startApolloServer() {
       }
       return [];
     },
-    // introspection: true, // process.env.NODE_ENV !== 'production',
   });
-  // await server.createHandler({
-  //   cors: {
-  //     origin: '*',
-  //     credentials: true,
-  //   },
-  // });
-  await server.start();
-  connectDB();
 
-  server.applyMiddleware({ app, path: '/', cors: false });
-  await new Promise((resolve) =>
-    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+
+  app.use((req, res) => {
+    res.send('Hello world!');
+  });
+
+  app.listen({ port: 4000 }, () =>
+    console.log(`🚀 Server ready at http://localhost:4000/graphql`)
   );
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
-  return { server, app };
 }
 
-startApolloServer()
-  .then((r) => r)
-  .catch((e) => console.log(e));
+setImmediate(startServer);
