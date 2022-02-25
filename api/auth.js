@@ -5,9 +5,16 @@ const createToken = (user, secret, expiresIn) => {
   const { nickname, roles, _id } = user;
   return jwt.sign({ nickname, roles, _id }, secret, { expiresIn });
 };
-const getUser = (token, secret) => {
-  const tokenBe = token.split(' ')[1];
-  jwt.verify(tokenBe, secret);
+const getUser = async (token, secret) => {
+  try {
+    const tokenBe = token.split(' ');
+    // console.log('a');
+    const tokenUser = await jwt.verify(tokenBe[1], secret);
+    return tokenUser;
+  } catch (e) {
+    console.log(e);
+  }
+  // return jwt.verify(tokenBe[1], secret);
 };
 module.exports = {
   createToken,

@@ -28,11 +28,14 @@ async function startApolloServer() {
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: ({ req }) => {
+    context: async ({ req }) => {
       const token = req.headers.authorization || '';
+      // console.log(token);
+
       if (token !== '') {
-        const user = jwtAction.getUser(token, process.env.SECRET);
-        // console.log(user);
+        console.log(token, '15');
+        const user = await jwtAction.getUser(token, process.env.SECRET);
+        console.log(user, 'user');
         if (!user) throw new ApolloError('you must be logged in');
 
         return { user };
