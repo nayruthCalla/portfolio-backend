@@ -18,11 +18,11 @@ async function startApolloServer() {
   app.get('/', (req, res) =>
     res.json({ name: pkg.name, version: pkg.version })
   );
-  // const corsOptions = {
-  //   origin: process.env.FRONTEND_URL,
-  //   credentials: true, // <-- REQUIRED backend setting
-  // };
-  app.use(cors());
+  const corsOptions = {
+    origin: new URL(process.env.FRONTEND_URL).origin,
+    credentials: true, // <-- REQUIRED backend setting
+  };
+  app.use(cors(corsOptions));
   const server = new ApolloServer({
     cors: false,
     typeDefs,
@@ -53,7 +53,7 @@ async function startApolloServer() {
   await server.start();
   connectDB();
 
-  server.applyMiddleware({ app, path: '/', cors: false });
+  server.applyMiddleware({ app, path: '/', cors: corsOptions });
   await new Promise((resolve) =>
     httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
   );
