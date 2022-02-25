@@ -10,17 +10,16 @@ const { createPaymentIntent } = require('./api/payment');
 
 async function startServer() {
   const app = express();
+  app.use(cors());
   app.get('/', (req, res) => res.json({ name: 'Portfolio' }));
   app.post('/create-checkout-session', createPaymentIntent);
 
   connectDB();
 
   console.log('Connected to MongoDB');
-  app.use(cors());
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-
     context: async ({ req }) => {
       const token = req.headers.authorization || '';
       // console.log(token);
