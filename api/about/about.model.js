@@ -23,13 +23,11 @@ const AboutSchema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    lowercase: true,
   },
   profession: {
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
   },
   linkUsername: {
     type: String,
