@@ -20,10 +20,7 @@ async function startServer() {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    cors: {
-      origin: '*',
-      credentials: true,
-    },
+
     context: async ({ req }) => {
       const token = req.headers.authorization || '';
       // console.log(token);
@@ -41,7 +38,13 @@ async function startServer() {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: {
+      origin: '*',
+      credentials: true,
+    },
+  });
 
   // app.use((req, res) => {
   //   res.send('Hello world!');
