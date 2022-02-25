@@ -1,6 +1,8 @@
 /* eslint-disable no-prototype-builtins */
 const { ApolloError } = require('apollo-server-express');
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
+const YOUR_DOMAIN = process.env.STRIPE_YOUR_DOMAIN;
 const User = require('./users/user.model');
 const AboutMe = require('./about/about.model');
 const Proyect = require('./proyects/proyect.model');
@@ -709,6 +711,42 @@ const resolvers = {
         }
         // console.log(aboutMe);
         return aboutMe;
+      } catch (err) {
+        // console.Console('');
+        return err;
+      }
+    },
+    getUrlPayment: async () => {
+      try {
+        const product = await stripe.products.create({
+          name: 'Coffe',
+          description: 'Recuerda que puedes enviarnos más de un regalito :)',
+          images: [
+            'https://res.cloudinary.com/drcn7ijzl/image/upload/v1645745679/regalo_dzdmh0.png',
+          ],
+        });
+        const price = await stripe.prices.create({
+          product: product.id,
+          unit_amount: 200,
+          currency: 'usd',
+        });
+        // console.log(product, price);
+        const session = await stripe.checkout.sessions.create({
+          line_items: [
+            {
+              // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+              price: price.id,
+              quantity: 1,
+              adjustable_quantity: {
+                enabled: true,
+              },
+            },
+          ],
+          mode: 'payment',
+          success_url: `${YOUR_DOMAIN}`,
+          cancel_url: `${YOUR_DOMAIN}`,
+        });
+        return session.url;
       } catch (err) {
         // console.Console('');
         return err;

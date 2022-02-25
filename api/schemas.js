@@ -487,6 +487,8 @@ const typeDefs = gql`
     """
     getLogrosByUser: [Logros]
 
+    getUrlPayment: String
+    getProfileUser(userName: ID!): [User]
     getProfileUserAbout(userName: ID!): [AboutMe]
     getProfileUserProyect(userName: ID!): [Proyect]
     getProfileUserSkill(userName: ID!): [Skill]
