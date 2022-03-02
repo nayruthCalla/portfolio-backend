@@ -16,17 +16,17 @@ const ProyectSchema = new mongoose.Schema({
   },
   proyectName: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   level: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   description: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   startDate: {
@@ -36,12 +36,12 @@ const ProyectSchema = new mongoose.Schema({
   },
   techFirst: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   techSecond: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   links: {

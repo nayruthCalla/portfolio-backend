@@ -13,7 +13,7 @@ const servicesDb = services();
 const jwtAction = require('./auth');
 const resolvers = {
   Mutation: {
-    addUser: async (_, { name, nickname, email, picture }) => {
+    addUser: async (_, { name, nickname, email, picture, networkIdent }) => {
       if (!nickname) {
         throw new ApolloError('The nickname it can not be null');
       }
@@ -40,6 +40,7 @@ const resolvers = {
           roles: {
             admin: false,
           },
+          networkIdent: networkIdent,
         });
         console.log(createUser);
         const token = jwtAction.createToken(

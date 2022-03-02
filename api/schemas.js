@@ -190,6 +190,7 @@ const typeDefs = gql`
       email: String
       "photo is the profile photo of the user in the App, is of type string, if it can be null"
       picture: String
+      networkIdent: String
     ): Token!
     # update User
     """

@@ -38,6 +38,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  networkIdent: {
+    type: String,
+    default: '',
+  },
 });
 
 module.exports = mongoose.model('User', UserSchema);

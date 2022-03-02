@@ -16,7 +16,7 @@ const AboutSchema = new mongoose.Schema({
   },
   firstName: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   lastName: {
@@ -26,7 +26,7 @@ const AboutSchema = new mongoose.Schema({
   },
   profession: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   linkUsername: {
@@ -36,12 +36,12 @@ const AboutSchema = new mongoose.Schema({
   },
   aboutMeText: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   interests: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   socialNetworks: {
