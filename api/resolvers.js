@@ -132,10 +132,18 @@ const resolvers = {
           User,
           context.user._id
         );
+        const aboutMeShow = await servicesDb.getDocumentByIdUserName(
+          AboutMe,
+          userDB.userName
+        );
+        // console.log(aboutMeShow, 'buscar about');
         if (
           userDB._id === context.user._id ||
           userDB.roles.admin === context.user.roles.admin
         ) {
+          if (aboutMeShow.length > 0) {
+            return aboutMeShow[0];
+          }
           const createAboutMe = servicesDb.createDocument(AboutMe, {
             userId: context.user._id,
             userName: userDB.userName,
