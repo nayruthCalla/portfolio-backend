@@ -24,8 +24,7 @@ const resolvers = {
       if (userExistsByNickName) {
         const token = jwtAction.createToken(
           userExistsByNickName,
-          process.env.SECRET,
-          '24h'
+          process.env.SECRET
         );
 
         return { token: token };
@@ -43,11 +42,7 @@ const resolvers = {
           networkIdent: networkIdent,
         });
         console.log(createUser);
-        const token = jwtAction.createToken(
-          createUser,
-          process.env.SECRET,
-          '24h'
-        );
+        const token = jwtAction.createToken(createUser, process.env.SECRET);
         return { token: token };
       } catch (err) {
         return err;

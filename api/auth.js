@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-const createToken = (user, secret, expiresIn) => {
+const createToken = (user, secret) => {
   console.log('creando token', user);
   const { nickname, roles, _id } = user;
-  return jwt.sign({ nickname, roles, _id }, secret, { expiresIn });
+  return jwt.sign({ nickname, roles, _id }, secret);
 };
 const getUser = async (token, secret) => {
   try {
